@@ -2,209 +2,183 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>读书笔记日历</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>读书笔记</title>
 <style>
-* {margin:0;padding:0;box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
-body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-    min-height: 100vh;
-    padding: 10px;
-    padding-bottom: 90px;
-    color: #1f2937;
-}
-.header {
-    text-align: center;
-    color: white;
-    padding: 15px 0;
-}
-.header h1 {
-    font-size: 1.6rem;
-    background: linear-gradient(to right, #fff, #e0e7ff);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-.container {max-width: 1200px; margin: 0 auto;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(135deg,#667eea,#764ba2);min-height:100vh;margin:0;padding:10px 10px 80px 10px}
+.card{background:rgba(255,255,255,0.95);border-radius:16px;padding:16px;margin-bottom:15px;box-shadow:0 4px 15px rgba(0,0,0,0.1)}
+h2{margin:0 0 15px 0;color:#4c1d95;font-size:1.1rem}
+.btn{background:linear-gradient(135deg,#8b5cf6,#ec4899);color:white;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;font-size:0.9rem}
+input,select,textarea{width:100%;padding:10px;margin:8px 0;border:1px solid #ddd;border-radius:8px;font-size:1rem;box-sizing:border-box}
+textarea{height:80px;resize:none}
+.book-item{display:flex;align-items:center;gap:10px;padding:10px;background:rgba(255,255,255,0.7);border-radius:10px;margin-bottom:8px}
+.book-cover{width:40px;height:55px;background:linear-gradient(135deg,#8b5cf6,#ec4899);border-radius:4px;display:flex;align-items:center;justify-content:center;color:white;font-size:1.2rem;overflow:hidden}
+.book-cover img{width:100%;height:100%;object-fit:cover}
+.del{color:#ef4444;background:none;border:none;font-size:1.2rem;cursor:pointer;margin-left:auto}
+.nav{position:fixed;bottom:15px;left:50%;transform:translateX(-50%);width:calc(100% - 30px);max-width:400px;height:60px;background:rgba(255,255,255,0.3);backdrop-filter:blur(10px);border-radius:30px;display:flex;box-shadow:0 4px 15px rgba(0,0,0,0.2)}
+.nav-item{flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;font-size:0.7rem;color:white;cursor:pointer}
+.nav-item.active{background:rgba(255,255,255,0.2);border-radius:25px;margin:5px}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;font-size:0.85rem}
+.cal div{padding:8px 0}
+.cal .h{font-weight:bold;color:#6b21a8}
+.cal .d{background:rgba(255,255,255,0.6);border-radius:8px;cursor:pointer;aspect-ratio:1;display:flex;align-items:center;justify-content:center}
+.cal .d.today{background:linear-gradient(135deg,#8b5cf6,#ec4899);color:white}
+.cal .d.sel{background:#06b6d4;color:white}
+.hide{display:none!important}
+.modal{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;padding:20px;z-index:100}
+.modal.show{display:flex}
+.modal-box{background:white;padding:20px;border-radius:16px;width:100%;max-width:350px}
+.upload{border:2px dashed #8b5cf6;border-radius:12px;padding:30px;text-align:center;margin-bottom:10px;cursor:pointer;background:rgba(139,92,246,0.05)}
+#preview{display:none;margin-bottom:10px;text-align:center}
+#preview img{max-width:120px;max-height:160px;border-radius:8px}
+</style>
+</head>
+<body>
 
-.card {
-    background: rgba(255,255,255,0.95);
-    backdrop-filter: blur(12px);
-    border-radius: 20px;
-    padding: 20px;
-    margin-bottom: 15px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-}
-.card-title {
-    font-size: 1.1rem;
-    font-weight: 700;
-    margin-bottom: 15px;
-    color: #4c1d95;
-}
+<div id="views">
+<!-- 日历 -->
+<div class="card" id="view-cal">
+<h2>📅 <span id="ym">2024年1月</span></h2>
+<div style="display:flex;gap:10px;margin-bottom:10px">
+<button class="btn" onclick="pm()">‹</button>
+<button class="btn" onclick="nm()">›</button>
+</div>
+<div class="cal" id="cal"></div>
+</div>
 
-/* 上传区域 - 修复点击问题 */
-.upload-area {
-    border: 2px dashed #8b5cf6;
-    border-radius: 16px;
-    padding: 40px 20px;
-    text-align: center;
-    margin-bottom: 15px;
-    cursor: pointer;
-    transition: all 0.2s;
-    background: rgba(139,92,246,0.05);
-    position: relative;
-    overflow: hidden;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    user-select: none;
-}
-.upload-area:active {
-    background: rgba(139,92,246,0.15);
-    transform: scale(0.98);
-    border-color: #ec4899;
-}
-.upload-area.has-image {
-    border-style: solid;
-    border-color: #10b981;
-    background: rgba(16,185,129,0.1);
-}
-.upload-icon {font-size: 3rem; margin-bottom: 10px; display: block;}
-.upload-text {color: #6b7280; font-size: 1rem; font-weight: 500;}
-.upload-hint {color: #9ca3af; font-size: 0.8rem; margin-top: 6px;}
+<!-- 书架 -->
+<div class="card hide" id="view-book">
+<h2>📖 书架 <button class="btn" onclick="showAdd()" style="float:right;font-size:0.8rem;padding:5px 10px">+ 添加</button></h2>
+<div id="blist"></div>
+</div>
 
-/* 隐藏的file input */
-#file-input {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    cursor: pointer;
-    z-index: 10;
-}
+<!-- 笔记 -->
+<div class="card hide" id="view-note">
+<h2>📝 笔记</h2>
+<select id="sb"><option value="">选择书籍</option></select>
+<textarea id="nt" placeholder="今天读了什么？"></textarea>
+<button class="btn" onclick="saven()" style="width:100%">保存</button>
+<div id="nlist" style="margin-top:15px"></div>
+</div>
+</div>
 
-/* 预览图 */
-.preview-container {
-    margin-bottom: 15px;
-    text-align: center;
-    display: none;
-    animation: fadeIn 0.3s;
-}
-.preview-container.show {display: block;}
-.preview-img {
-    max-width: 160px;
-    max-height: 220px;
-    border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-    border: 3px solid white;
-}
-.remove-btn {
-    margin-top: 10px;
-    color: #ef4444;
-    font-size: 0.9rem;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 6px 12px;
-    border-radius: 20px;
-    background: rgba(239,68,68,0.1);
-}
+<!-- 底部导航 -->
+<div class="nav">
+<div class="nav-item active" onclick="switchv('cal',this)">📅<br>日历</div>
+<div class="nav-item" onclick="switchv('book',this)">📚<br>书架</div>
+<div class="nav-item" onclick="switchv('note',this)">📝<br>笔记</div>
+</div>
 
-/* 书架 */
-.book-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
+<!-- 添加弹窗 -->
+<div class="modal" id="addm">
+<div class="modal-box">
+<h3 style="margin-top:0;color:#4c1d95">添加书籍</h3>
+<div class="upload" onclick="document.getElementById('fin').click()">
+<div style="font-size:2rem">📷</div>
+<div style="font-size:0.9rem;color:#666">点击上传封面</div>
+</div>
+<input type="file" id="fin" accept="image/*" style="display:none" onchange="handlef(this)">
+<div id="preview"><img id="pimg"><br><small onclick="clrimg()" style="color:#ef4444;cursor:pointer">移除</small></div>
+<input type="text" id="bn" placeholder="书名">
+<button class="btn" onclick="addb()" style="width:100%;margin-top:10px">确认添加</button>
+<button onclick="document.getElementById('addm').classList.remove('show')" style="width:100%;margin-top:8px;padding:10px;border:none;background:#f3f4f6;border-radius:8px;cursor:pointer">取消</button>
+</div>
+</div>
+
+<script>
+// 数据
+let data={books:[],covers:{},notes:[]};
+let cur=new Date(),sel=new Date(),tmpimg=null;
+
+// 存储
+try{let d=localStorage.getItem('rd');if(d)data=JSON.parse(d)}catch(e){}
+function sv(){try{localStorage.setItem('rd',JSON.stringify(data))}catch(e){alert('存储已满，请删除一些图片')}}
+
+// 文件处理
+function handlef(input){
+let f=input.files[0];if(!f)return;
+let r=new FileReader();
+r.onload=function(e){tmpimg=e.target.result;document.getElementById('pimg').src=tmpimg;document.getElementById('preview').style.display='block'};
+r.readAsDataURL(f);
 }
-.add-btn {
-    width: 44px;
-    height: 44px;
-    background: linear-gradient(135deg, #8b5cf6, #ec4899);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    font-size: 1.8rem;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(139,92,246,0.4);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    -webkit-tap-highlight-color: rgba(0,0,0,0.1);
+function clrimg(){tmpimg=null;document.getElementById('preview').style.display='none';document.getElementById('fin').value=''}
+
+// 日历
+function rd(){
+let y=cur.getFullYear(),m=cur.getMonth();
+document.getElementById('ym').textContent=y+'年'+(m+1)+'月';
+let g=document.getElementById('cal');
+g.innerHTML='<div class="h">日</div><div class="h">一</div><div class="h">二</div><div class="h">三</div><div class="h">四</div><div class="h">五</div><div class="h">六</div>';
+let fd=new Date(y,m,1).getDay();
+for(let i=0;i<fd;i++)g.innerHTML+='<div></div>';
+let td=new Date();
+for(let d=1;d<=new Date(y,m+1,0).getDate();d++){
+let ds=y+'-'+(m+1)+'-'+d,h=data.notes.some(n=>n.date===ds);
+let c='d'+(y==td.getFullYear()&&m==td.getMonth()&&d==td.getDate()?' today':'')+(y==sel.getFullYear()&&m==sel.getMonth()&&d==sel.getDate()?' sel':'');
+g.innerHTML+='<div class="'+c+'" onclick="sd('+y+','+m+','+d+')">'+d+(h?'<div style="width:4px;height:4px;background:#10b981;border-radius:50%;margin:2px auto 0"></div>':'')+'</div>';
 }
-.book-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px;
-    background: rgba(255,255,255,0.7);
-    border-radius: 12px;
-    margin-bottom: 10px;
-    position: relative;
-    touch-action: manipulation;
 }
-.book-cover {
-    width: 50px;
-    height: 68px;
-    border-radius: 6px;
-    background: linear-gradient(135deg, #8b5cf6, #ec4899);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 1.5rem;
-    overflow: hidden;
-    flex-shrink: 0;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+function pm(){cur.setMonth(cur.getMonth()-1);rd()}
+function nm(){cur.setMonth(cur.getMonth()+1);rd()}
+function sd(y,m,d){sel=new Date(y,m,d);rd();if(window.innerWidth<768)switchv('note',document.querySelectorAll('.nav-item')[2]);rn()}
+
+// 书架
+function rb(){
+let b=document.getElementById('blist');
+if(data.books.length==0){b.innerHTML='<div style="color:#999;text-align:center;padding:20px">暂无书籍，点击右上角添加</div>';return}
+b.innerHTML=data.books.map((x,i)=>{
+let c=data.covers[x],t=data.notes.filter(n=>n.book==x).length;
+return'<div class="book-item" onclick="sb(\''+x+'\')"><div class="book-cover">'+(c?'<img src="'+c+'">':x[0])+'</div><div style="flex:1"><div style="font-weight:600;color:#4c1d95">'+x+'</div><div style="font-size:0.8rem;color:#666">'+t+'条笔记</div></div><button class="del" onclick="db(event,'+i+')">🗑️</button></div>';
+}).join('');
+let o=data.books.map(x=>'<option value="'+x+'">'+x+'</option>').join('');
+document.getElementById('sb').innerHTML='<option value="">选择书籍</option>'+o;
 }
-.book-cover img {width: 100%; height: 100%; object-fit: cover;}
-.book-info {flex: 1; min-width: 0;}
-.book-name {font-weight: 600; font-size: 1rem; color: #4c1d95; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
-.book-time {font-size: 0.8rem; color: #6b7280;}
-.delete-btn {
-    width: 36px;
-    height: 36px;
-    border: none;
-    background: rgba(239,68,68,0.1);
-    color: #ef4444;
-    border-radius: 50%;
-    cursor: pointer;
-    font-size: 1.1rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
+function showAdd(){tmpimg=null;document.getElementById('bn').value='';document.getElementById('preview').style.display='none';document.getElementById('addm').classList.add('show')}
+function addb(){
+let n=document.getElementById('bn').value.trim();
+if(!n){alert('请输入书名');return}
+if(data.books.includes(n)){alert('该书已存在');return}
+data.books.push(n);
+if(tmpimg)data.covers[n]=tmpimg;
+sv();rb();document.getElementById('addm').classList.remove('show');
 }
-.delete-btn:active {
-    background: #ef4444;
-    color: white;
-    transform: scale(0.9);
+function db(e,i){
+e.stopPropagation();
+if(confirm('删除《'+data.books[i]+'》？')){
+data.books.splice(i,1);
+sv();rb();rd();
+}
+}
+function sb(x){document.getElementById('sb').value=x;switchv('note',document.querySelectorAll('.nav-item')[2])}
+
+// 笔记
+function rn(){
+let ds=sel.getFullYear()+'-'+(sel.getMonth()+1)+'-'+sel.getDate();
+let n=data.notes.filter(x=>x.date==ds).reverse();
+document.getElementById('nlist').innerHTML=n.length==0?'<div style="color:#999;text-align:center">'+ds+'<br>暂无笔记</div>':n.map(x=>'<div style="padding:10px;background:#f3f4f6;border-radius:8px;margin-bottom:8px"><div style="color:#6b21a8;font-weight:600">'+x.book+'</div><div>'+x.content+'</div></div>').join('');
+}
+function saven(){
+let b=document.getElementById('sb').value,t=document.getElementById('nt').value.trim();
+if(!b||!t){alert('请填写完整');return}
+data.notes.push({date:sel.getFullYear()+'-'+(sel.getMonth()+1)+'-'+sel.getDate(),book:b,content:t});
+document.getElementById('nt').value='';
+sv();rn();rd();alert('保存成功');
 }
 
-/* 日历 */
-.cal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px;
+// 切换
+function switchv(v,e){
+document.getElementById('view-cal').classList.add('hide');
+document.getElementById('view-book').classList.add('hide');
+document.getElementById('view-note').classList.add('hide');
+document.getElementById('view-'+v).classList.remove('hide');
+document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
+if(e)e.classList.add('active');
+if(v=='book')rb();
+if(v=='note')rn();
 }
-.cal-header button {
-    width: 36px;
-    height: 36px;
-    border: none;
-    background: linear-gradient(135deg, #8b5cf6, #ec4899);
-    color: white;
-    border-radius: 50%;
-    cursor: pointer;
-    font-size: 1.2rem;
-    box-shadow: 0 4px 8px rgba(139,92,246,0.3);
-}
-.cal-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 4px;
-    text-align: center;
-}
-.
+
+// 初始化
+rd();rb();
+</script>
+</body>
+</html>
