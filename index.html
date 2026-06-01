@@ -5,32 +5,54 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>读书笔记</title>
 <style>
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(135deg,#667eea,#764ba2);min-height:100vh;margin:0;padding:10px 10px 80px 10px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(135deg,#667eea,#764ba2);min-height:100vh;margin:0;padding:10px 10px 90px 10px}
 .card{background:rgba(255,255,255,0.95);border-radius:16px;padding:16px;margin-bottom:15px;box-shadow:0 4px 15px rgba(0,0,0,0.1)}
 h2{margin:0 0 15px 0;color:#4c1d95;font-size:1.1rem}
 .btn{background:linear-gradient(135deg,#8b5cf6,#ec4899);color:white;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;font-size:0.9rem}
 input,select,textarea{width:100%;padding:10px;margin:8px 0;border:1px solid #ddd;border-radius:8px;font-size:1rem;box-sizing:border-box}
 textarea{height:80px;resize:none}
+
+/* 书架 */
 .book-item{display:flex;align-items:center;gap:10px;padding:10px;background:rgba(255,255,255,0.7);border-radius:10px;margin-bottom:8px}
-.book-cover{width:40px;height:55px;background:linear-gradient(135deg,#8b5cf6,#ec4899);border-radius:4px;display:flex;align-items:center;justify-content:center;color:white;font-size:1.2rem;overflow:hidden}
+.book-cover{width:45px;height:60px;background:linear-gradient(135deg,#8b5cf6,#ec4899);border-radius:4px;display:flex;align-items:center;justify-content:center;color:white;font-size:1.2rem;overflow:hidden;flex-shrink:0}
 .book-cover img{width:100%;height:100%;object-fit:cover}
-.del{color:#ef4444;background:none;border:none;font-size:1.2rem;cursor:pointer;margin-left:auto}
-.nav{position:fixed;bottom:15px;left:50%;transform:translateX(-50%);width:calc(100% - 30px);max-width:400px;height:60px;background:rgba(255,255,255,0.3);backdrop-filter:blur(10px);border-radius:30px;display:flex;box-shadow:0 4px 15px rgba(0,0,0,0.2)}
-.nav-item{flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;font-size:0.7rem;color:white;cursor:pointer}
-.nav-item.active{background:rgba(255,255,255,0.2);border-radius:25px;margin:5px}
-.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;font-size:0.85rem}
-.cal div{padding:8px 0}
-.cal .h{font-weight:bold;color:#6b21a8}
-.cal .d{background:rgba(255,255,255,0.6);border-radius:8px;cursor:pointer;aspect-ratio:1;display:flex;align-items:center;justify-content:center}
+.del{color:#ef4444;background:none;border:none;font-size:1.2rem;cursor:pointer;margin-left:auto;padding:5px}
+
+/* 日历 */
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;font-size:0.8rem}
+.cal div{padding:6px 0}
+.cal .h{font-weight:bold;color:#6b21a8;font-size:0.75rem}
+.cal .d{background:rgba(255,255,255,0.6);border-radius:8px;cursor:pointer;min-height:50px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden}
 .cal .d.today{background:linear-gradient(135deg,#8b5cf6,#ec4899);color:white}
 .cal .d.sel{background:#06b6d4;color:white}
+.cal-cover{width:20px;height:28px;border-radius:2px;object-fit:cover;margin-top:2px;border:1px solid rgba(255,255,255,0.5)}
+
+/* 笔记 */
+.note-item{background:#f3f4f6;padding:12px;border-radius:8px;margin-bottom:10px;position:relative}
+.note-book{color:#6b21a8;font-weight:600;margin-bottom:4px;font-size:0.9rem}
+.note-del{position:absolute;top:5px;right:5px;background:#ef4444;color:white;border:none;border-radius:50%;width:24px;height:24px;cursor:pointer;font-size:0.8rem}
+
+/* 计时器 */
+.timer-box{text-align:center;padding:20px;background:rgba(255,255,255,0.1);border-radius:12px;margin:10px 0;color:white}
+.timer-num{font-size:2.5rem;font-family:monospace;font-weight:700;margin:10px 0}
+.timer-btn{padding:10px 20px;margin:0 5px;border:none;border-radius:20px;cursor:pointer;font-weight:600}
+.timer-start{background:#10b981;color:white}
+.timer-pause{background:#f59e0b;color:white}
+.timer-stop{background:#ef4444;color:white}
+
+/* 导航 */
+.nav{position:fixed;bottom:15px;left:50%;transform:translateX(-50%);width:calc(100% - 30px);max-width:450px;height:60px;background:rgba(255,255,255,0.25);backdrop-filter:blur(10px);border-radius:30px;display:flex;box-shadow:0 4px 15px rgba(0,0,0,0.2)}
+.nav-item{flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;font-size:0.65rem;color:white;cursor:pointer;transition:all 0.3s}
+.nav-item.active{background:rgba(255,255,255,0.2);border-radius:25px;margin:5px}
+.nav-icon{font-size:1.3rem;margin-bottom:2px}
+
 .hide{display:none!important}
 .modal{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;padding:20px;z-index:100}
 .modal.show{display:flex}
-.modal-box{background:white;padding:20px;border-radius:16px;width:100%;max-width:350px}
-.upload{border:2px dashed #8b5cf6;border-radius:12px;padding:30px;text-align:center;margin-bottom:10px;cursor:pointer;background:rgba(139,92,246,0.05)}
+.modal-box{background:white;padding:20px;border-radius:16px;width:100%;max-width:350px;max-height:80vh;overflow-y:auto}
+.upload{border:2px dashed #8b5cf6;border-radius:12px;padding:25px;text-align:center;margin-bottom:10px;cursor:pointer}
 #preview{display:none;margin-bottom:10px;text-align:center}
-#preview img{max-width:120px;max-height:160px;border-radius:8px}
+#preview img{max-width:100px;max-height:140px;border-radius:8px}
 </style>
 </head>
 <body>
@@ -38,7 +60,7 @@ textarea{height:80px;resize:none}
 <div id="views">
 <!-- 日历 -->
 <div class="card" id="view-cal">
-<h2>📅 <span id="ym">2024年1月</span></h2>
+<h2>📅 <span id="ym">2024年</span></h2>
 <div style="display:flex;gap:10px;margin-bottom:10px">
 <button class="btn" onclick="pm()">‹</button>
 <button class="btn" onclick="nm()">›</button>
@@ -60,13 +82,31 @@ textarea{height:80px;resize:none}
 <button class="btn" onclick="saven()" style="width:100%">保存</button>
 <div id="nlist" style="margin-top:15px"></div>
 </div>
+
+<!-- 计时 -->
+<div class="card hide" id="view-timer">
+<h2>⏱️ 计时器</h2>
+<select id="tb" style="margin-bottom:15px"><option value="">选择书籍</option></select>
+<div class="timer-box">
+<div>本次阅读</div>
+<div class="timer-num" id="tdisp">00:00:00</div>
+<button class="timer-btn timer-start" onclick="tstart()">开始</button>
+<button class="timer-btn timer-pause" onclick="tpause()" style="display:none">暂停</button>
+<button class="timer-btn timer-stop" onclick="tstop()">结束</button>
+</div>
+<div style="margin-top:20px">
+<h3 style="font-size:1rem;color:#4c1d95">今日阅读统计</h3>
+<div id="tstats"></div>
+</div>
+</div>
 </div>
 
-<!-- 底部导航 -->
+<!-- 导航 -->
 <div class="nav">
-<div class="nav-item active" onclick="switchv('cal',this)">📅<br>日历</div>
-<div class="nav-item" onclick="switchv('book',this)">📚<br>书架</div>
-<div class="nav-item" onclick="switchv('note',this)">📝<br>笔记</div>
+<div class="nav-item active" onclick="switchv('cal',this)"><div class="nav-icon">📅</div><div>日历</div></div>
+<div class="nav-item" onclick="switchv('book',this)"><div class="nav-icon">📚</div><div>书架</div></div>
+<div class="nav-item" onclick="switchv('note',this)"><div class="nav-icon">📝</div><div>笔记</div></div>
+<div class="nav-item" onclick="switchv('timer',this)"><div class="nav-icon">⏱️</div><div>计时</div></div>
 </div>
 
 <!-- 添加弹窗 -->
@@ -75,10 +115,10 @@ textarea{height:80px;resize:none}
 <h3 style="margin-top:0;color:#4c1d95">添加书籍</h3>
 <div class="upload" onclick="document.getElementById('fin').click()">
 <div style="font-size:2rem">📷</div>
-<div style="font-size:0.9rem;color:#666">点击上传封面</div>
+<div style="font-size:0.9rem;color:#666;margin-top:5px">点击上传封面</div>
 </div>
 <input type="file" id="fin" accept="image/*" style="display:none" onchange="handlef(this)">
-<div id="preview"><img id="pimg"><br><small onclick="clrimg()" style="color:#ef4444;cursor:pointer">移除</small></div>
+<div id="preview"><img id="pimg"><br><small onclick="clrimg()" style="color:#ef4444;cursor:pointer">移除图片</small></div>
 <input type="text" id="bn" placeholder="书名">
 <button class="btn" onclick="addb()" style="width:100%;margin-top:10px">确认添加</button>
 <button onclick="document.getElementById('addm').classList.remove('show')" style="width:100%;margin-top:8px;padding:10px;border:none;background:#f3f4f6;border-radius:8px;cursor:pointer">取消</button>
@@ -87,14 +127,15 @@ textarea{height:80px;resize:none}
 
 <script>
 // 数据
-let data={books:[],covers:{},notes:[]};
+let data={books:[],covers:{},notes:[],time:{},todayTime:{}};
 let cur=new Date(),sel=new Date(),tmpimg=null;
+let tmr=null,tsec=0,trun=false;
 
 // 存储
-try{let d=localStorage.getItem('rd');if(d)data=JSON.parse(d)}catch(e){}
-function sv(){try{localStorage.setItem('rd',JSON.stringify(data))}catch(e){alert('存储已满，请删除一些图片')}}
+try{let d=localStorage.getItem('rd2');if(d)data=JSON.parse(d)}catch(e){}
+function sv(){try{localStorage.setItem('rd2',JSON.stringify(data))}catch(e){alert('存储空间不足，请删除一些书籍封面')}}
 
-// 文件处理
+// 文件上传
 function handlef(input){
 let f=input.files[0];if(!f)return;
 let r=new FileReader();
@@ -103,7 +144,7 @@ r.readAsDataURL(f);
 }
 function clrimg(){tmpimg=null;document.getElementById('preview').style.display='none';document.getElementById('fin').value=''}
 
-// 日历
+// 日历 - 显示封面
 function rd(){
 let y=cur.getFullYear(),m=cur.getMonth();
 document.getElementById('ym').textContent=y+'年'+(m+1)+'月';
@@ -111,11 +152,15 @@ let g=document.getElementById('cal');
 g.innerHTML='<div class="h">日</div><div class="h">一</div><div class="h">二</div><div class="h">三</div><div class="h">四</div><div class="h">五</div><div class="h">六</div>';
 let fd=new Date(y,m,1).getDay();
 for(let i=0;i<fd;i++)g.innerHTML+='<div></div>';
-let td=new Date();
+let td=new Date(),ymd=y+'-'+(m+1)+'-';
 for(let d=1;d<=new Date(y,m+1,0).getDate();d++){
-let ds=y+'-'+(m+1)+'-'+d,h=data.notes.some(n=>n.date===ds);
-let c='d'+(y==td.getFullYear()&&m==td.getMonth()&&d==td.getDate()?' today':'')+(y==sel.getFullYear()&&m==sel.getMonth()&&d==sel.getDate()?' sel':'');
-g.innerHTML+='<div class="'+c+'" onclick="sd('+y+','+m+','+d+')">'+d+(h?'<div style="width:4px;height:4px;background:#10b981;border-radius:50%;margin:2px auto 0"></div>':'')+'</div>';
+let ds=ymd+d,notes=data.notes.filter(n=>n.date==ds),books=[...new Set(notes.map(n=>n.book))];
+let c='d'+(y==td.getFullYear()&&m==td.getMonth()&&d==td.getDate()?' today':'')+(ds==sel.getFullYear()+'-'+(sel.getMonth()+1)+'-'+sel.getDate()?' sel':'');
+let imgs=books.slice(0,2).map(b=>{
+let src=data.covers[b];
+return src?`<img src="${src}" class="cal-cover">`:'';
+}).join('');
+g.innerHTML+=`<div class="${c}" onclick="sd(${y},${m},${d})"><div>${d}</div>${imgs}</div>`;
 }
 }
 function pm(){cur.setMonth(cur.getMonth()-1);rd()}
@@ -125,57 +170,113 @@ function sd(y,m,d){sel=new Date(y,m,d);rd();if(window.innerWidth<768)switchv('no
 // 书架
 function rb(){
 let b=document.getElementById('blist');
-if(data.books.length==0){b.innerHTML='<div style="color:#999;text-align:center;padding:20px">暂无书籍，点击右上角添加</div>';return}
+if(data.books.length==0){b.innerHTML='<div style="color:#999;text-align:center;padding:20px">点击右上角添加书籍</div>';return}
 b.innerHTML=data.books.map((x,i)=>{
-let c=data.covers[x],t=data.notes.filter(n=>n.book==x).length;
-return'<div class="book-item" onclick="sb(\''+x+'\')"><div class="book-cover">'+(c?'<img src="'+c+'">':x[0])+'</div><div style="flex:1"><div style="font-weight:600;color:#4c1d95">'+x+'</div><div style="font-size:0.8rem;color:#666">'+t+'条笔记</div></div><button class="del" onclick="db(event,'+i+')">🗑️</button></div>';
+let c=data.covers[x],mins=Math.floor((data.time[x]||0)/60);
+return`<div class="book-item" onclick="sb('${x}')"><div class="book-cover">${c?`<img src="${c}">`:x[0]}</div><div style="flex:1"><div style="font-weight:600;color:#4c1d95">${x}</div><div style="font-size:0.75rem;color:#666">已读${mins}分钟</div></div><button class="del" onclick="db(event,${i})">🗑️</button></div>`;
 }).join('');
 let o=data.books.map(x=>'<option value="'+x+'">'+x+'</option>').join('');
 document.getElementById('sb').innerHTML='<option value="">选择书籍</option>'+o;
+document.getElementById('tb').innerHTML='<option value="">选择书籍</option>'+o;
 }
 function showAdd(){tmpimg=null;document.getElementById('bn').value='';document.getElementById('preview').style.display='none';document.getElementById('addm').classList.add('show')}
 function addb(){
 let n=document.getElementById('bn').value.trim();
 if(!n){alert('请输入书名');return}
 if(data.books.includes(n)){alert('该书已存在');return}
-data.books.push(n);
-if(tmpimg)data.covers[n]=tmpimg;
+data.books.push(n);if(tmpimg)data.covers[n]=tmpimg;
 sv();rb();document.getElementById('addm').classList.remove('show');
 }
-function db(e,i){
-e.stopPropagation();
-if(confirm('删除《'+data.books[i]+'》？')){
-data.books.splice(i,1);
-sv();rb();rd();
-}
-}
+function db(e,i){e.stopPropagation();if(!confirm('删除《'+data.books[i]+'》？'))return;data.books.splice(i,1);sv();rb();rd();}
 function sb(x){document.getElementById('sb').value=x;switchv('note',document.querySelectorAll('.nav-item')[2])}
 
-// 笔记
+// 笔记 - 可删除
 function rn(){
 let ds=sel.getFullYear()+'-'+(sel.getMonth()+1)+'-'+sel.getDate();
 let n=data.notes.filter(x=>x.date==ds).reverse();
-document.getElementById('nlist').innerHTML=n.length==0?'<div style="color:#999;text-align:center">'+ds+'<br>暂无笔记</div>':n.map(x=>'<div style="padding:10px;background:#f3f4f6;border-radius:8px;margin-bottom:8px"><div style="color:#6b21a8;font-weight:600">'+x.book+'</div><div>'+x.content+'</div></div>').join('');
+document.getElementById('nlist').innerHTML=n.length==0?'<div style="color:#999;text-align:center">暂无笔记</div>':n.map((x,i)=>'<div class="note-item"><button class="note-del" onclick="dn('+i+')">×</button><div class="note-book">'+x.book+'</div><div>'+x.content+'</div></div>').join('');
 }
 function saven(){
 let b=document.getElementById('sb').value,t=document.getElementById('nt').value.trim();
 if(!b||!t){alert('请填写完整');return}
 data.notes.push({date:sel.getFullYear()+'-'+(sel.getMonth()+1)+'-'+sel.getDate(),book:b,content:t});
-document.getElementById('nt').value='';
-sv();rn();rd();alert('保存成功');
+document.getElementById('nt').value='';sv();rn();rd();
+}
+function dn(idx){
+let ds=sel.getFullYear()+'-'+(sel.getMonth()+1)+'-'+sel.getDate();
+let notes=data.notes.filter(x=>x.date==ds).reverse();
+if(confirm('删除这条笔记？')){data.notes.splice(data.notes.indexOf(notes[idx]),1);sv();rn();rd();}
+}
+
+// 计时器
+function rt(){
+let tdata=data.todayTime||{};
+document.getElementById('tstats').innerHTML=data.books.map(b=>{
+let m=Math.floor((tdata[b]||0)/60);
+return m>0?`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #eee"><span>${b}</span><span style="color:#8b5cf6;font-weight:600">${m}分钟</span></div>`:'';
+}).join('')||'<div style="color:#999;text-align:center">今日暂无记录</div>';
+}
+function tstart(){
+let b=document.getElementById('tb').value;if(!b){alert('请选择书籍');return}
+trun=true;
+document.querySelector('.timer-start').style.display='none';
+document.querySelector('.timer-pause').style.display='inline-block';
+tmr=setInterval(()=>{
+tsec++;
+let h=Math.floor(tsec/3600),m=Math.floor((tsec%3600)/60),s=tsec%60;
+document.getElementById('tdisp').textContent=[h,m,s].map(v=>String(v).padStart(2,'0')).join(':');
+},1000);
+}
+function tpause(){
+if(trun){
+clearInterval(tmr);trun=false;
+document.querySelector('.timer-pause').textContent='继续';
+}else{
+trun=true;
+document.querySelector('.timer-pause').textContent='暂停';
+tmr=setInterval(()=>{
+tsec++;
+let h=Math.floor(tsec/3600),m=Math.floor((tsec%3600)/60),s=tsec%60;
+document.getElementById('tdisp').textContent=[h,m,s].map(v=>String(v).padStart(2,'0')).join(':');
+},1000);
+}
+}
+function tstop(){
+clearInterval(tmr);trun=false;
+let b=document.getElementById('tb').value;
+if(b&&tsec>0){
+data.time[b]=(data.time[b]||0)+tsec;
+data.todayTime=data.todayTime||{};
+data.todayTime[b]=(data.todayTime[b]||0)+tsec;
+sv();rb();rt();
+}
+tsec=0;document.getElementById('tdisp').textContent='00:00:00';
+document.querySelector('.timer-start').style.display='inline-block';
+document.querySelector('.timer-pause').style.display='none';
+document.querySelector('.timer-pause').textContent='暂停';
 }
 
 // 切换
 function switchv(v,e){
-document.getElementById('view-cal').classList.add('hide');
-document.getElementById('view-book').classList.add('hide');
-document.getElementById('view-note').classList.add('hide');
+['cal','book','note','timer'].forEach(x=>document.getElementById('view-'+x).classList.add('hide'));
 document.getElementById('view-'+v).classList.remove('hide');
 document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
-if(e)e.classList.add('active');
+e.classList.add('active');
 if(v=='book')rb();
 if(v=='note')rn();
+if(v=='timer'){rb();rt();}
 }
+
+// 每日重置今日统计
+let today=new Date().toDateString();
+try{
+let lt=localStorage.getItem('rd2_last');
+if(lt!=today){
+data.todayTime={};
+localStorage.setItem('rd2_last',today);
+sv();
+}
+}catch(e){}
 
 // 初始化
 rd();rb();
