@@ -3,174 +3,844 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>📚 读书笔记日历</title>
+<title>读书笔记日历</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-:root{--primary:#6c5ce7;--secondary:#a29bfe;--accent:#fd79a8;--warm:#fdcb6e;--mint:#00cec9;--coral:#e17055;--sky:#74b9ff;--lavender:#dfe6e9;--dark:#2d3436;--light:#ffeaa7}
-body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;padding:20px;color:var(--dark)}
-.app-container{max-width:1200px;margin:0 auto}
-.app-header{text-align:center;padding:24px 0;color:white}
-.app-header h1{font-size:2.4rem;text-shadow:2px 2px 4px rgba(0,0,0,0.2);margin-bottom:6px}
-.app-header p{font-size:1rem;opacity:0.9}
-.main-layout{display:grid;grid-template-columns:1fr 380px;gap:24px;align-items:start}
-@media(max-width:900px){.main-layout{grid-template-columns:1fr}}
-.card{background:white;border-radius:20px;padding:24px;box-shadow:0 10px 40px rgba(0,0,0,0.1)}
-.calendar-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
-.calendar-header h2{font-size:1.4rem;color:var(--primary)}
-.calendar-nav{display:flex;gap:8px}
-.calendar-nav button{width:36px;height:36px;border:none;border-radius:50%;background:var(--secondary);color:white;font-size:1.1rem;cursor:pointer;transition:all 0.2s}
-.calendar-nav button:hover{background:var(--primary);transform:scale(1.1)}
-.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
-.day-name{text-align:center;font-weight:600;color:var(--primary);padding:8px 0;font-size:0.85rem}
-.day-cell{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:12px;cursor:pointer;transition:all 0.2s;position:relative;font-size:0.9rem}
-.day-cell:hover{background:var(--lavender);transform:scale(1.05)}
-.day-cell.today{background:linear-gradient(135deg,var(--primary),var(--secondary));color:white;font-weight:700}
-.day-cell.selected{background:linear-gradient(135deg,var(--accent),var(--coral));color:white;font-weight:700;box-shadow:0 4px 15px rgba(253,121,168,0.4)}
-.day-cell.has-notes::after{content:'';position:absolute;bottom:4px;width:6px;height:6px;border-radius:50%;background:var(--mint)}
-.day-cell.has-notes.today::after,.day-cell.has-notes.selected::after{background:var(--warm)}
-.day-cell.other-month{opacity:0.3}
-.stats-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:20px}
-.stat-item{text-align:center;padding:14px 8px;border-radius:14px}
-.stat-item:nth-child(1){background:linear-gradient(135deg,#ffeaa7,#fff)}
-.stat-item:nth-child(2){background:linear-gradient(135deg,#dfe6e9,#fff)}
-.stat-item:nth-child(3){background:linear-gradient(135deg,#ffecd2,#fff)}
-.stat-number{font-size:1.5rem;font-weight:700;color:var(--primary)}
-.stat-label{font-size:0.75rem;color:#636e72;margin-top:2px}
-.right-panel{display:flex;flex-direction:column;gap:20px}
-.timer-card{background:linear-gradient(135deg,#6c5ce7,#a29bfe);color:white}
-.timer-card h3{margin-bottom:12px;font-size:1.1rem}
-.timer-display{text-align:center;font-size:3rem;font-weight:700;font-family:'Courier New',monospace;margin:12px 0;text-shadow:2px 2px 4px rgba(0,0,0,0.2)}
-.timer-book-select{width:100%;padding:10px 14px;border:2px solid rgba(255,255,255,0.3);border-radius:10px;background:rgba(255,255,255,0.15);color:white;font-size:0.9rem;margin-bottom:12px;outline:none}
-.timer-book-select option{color:var(--dark);background:white}
-.timer-controls{display:flex;gap:10px;justify-content:center}
-.timer-controls button{padding:10px 24px;border:none;border-radius:25px;font-size:0.9rem;font-weight:600;cursor:pointer;transition:all 0.2s}
-.btn-start{background:var(--mint);color:white}
-.btn-pause{background:var(--warm);color:var(--dark)}
-.btn-stop{background:var(--accent);color:white}
-.timer-controls button:hover{transform:scale(1.05);box-shadow:0 4px 15px rgba(0,0,0,0.2)}
-.notes-card h3{color:var(--primary);margin-bottom:4px}
-.notes-date{font-size:0.85rem;color:#636e72;margin-bottom:14px}
-.book-input-group{display:flex;gap:8px;margin-bottom:12px}
-.book-input-group input{flex:1;padding:10px 14px;border:2px solid var(--lavender);border-radius:10px;font-size:0.9rem;outline:none;transition:border-color 0.2s}
-.book-input-group input:focus{border-color:var(--secondary)}
-.book-input-group button{padding:10px 16px;border:none;border-radius:10px;background:var(--primary);color:white;font-size:0.9rem;cursor:pointer;transition:all 0.2s;white-space:nowrap}
-.book-input-group button:hover{background:var(--secondary)}
-.note-textarea{width:100%;min-height:120px;padding:14px;border:2px solid var(--lavender);border-radius:12px;font-size:0.9rem;font-family:inherit;resize:vertical;outline:none;transition:border-color 0.2s}
-.note-textarea:focus{border-color:var(--secondary)}
-.save-note-btn{width:100%;padding:12px;border:none;border-radius:12px;background:linear-gradient(135deg,var(--mint),#55efc4);color:white;font-size:1rem;font-weight:600;cursor:pointer;margin-top:12px;transition:all 0.2s}
-.save-note-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,206,201,0.4)}
-.notes-list{margin-top:16px;max-height:300px;overflow-y:auto}
-.note-item{padding:12px;border-radius:12px;margin-bottom:10px;border-left:4px solid;transition:all 0.2s}
-.note-item:nth-child(5n+1){background:#fff3e0;border-color:var(--coral)}
-.note-item:nth-child(5n+2){background:#e8f5e9;border-color:var(--mint)}
-.note-item:nth-child(5n+3){background:#f3e5f5;border-color:var(--primary)}
-.note-item:nth-child(5n+4){background:#e3f2fd;border-color:var(--sky)}
-.note-item:nth-child(5n+5){background:#fff8e1;border-color:var(--warm)}
-.note-item:hover{transform:translateX(4px)}
-.note-item-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
-.note-item-book{font-weight:600;font-size:0.9rem}
-.note-item-time{font-size:0.75rem;color:#636e72;background:rgba(0,0,0,0.05);padding:2px 8px;border-radius:10px}
-.note-item-content{font-size:0.85rem;color:#555;line-height:1.5;white-space:pre-wrap}
-.note-item-delete{background:none;border:none;color:#b2bec3;cursor:pointer;font-size:1rem;padding:2px 6px;border-radius:4px;transition:all 0.2s}
-.note-item-delete:hover{color:var(--accent);background:rgba(253,121,168,0.1)}
-.book-list-card h3{color:var(--primary);margin-bottom:14px}
-.book-list{max-height:200px;overflow-y:auto}
-.book-item{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-radius:10px;margin-bottom:6px;background:linear-gradient(135deg,#f8f9fa,#fff);transition:all 0.2s}
-.book-item:hover{background:linear-gradient(135deg,var(--lavender),#fff);transform:translateX(3px)}
-.book-item-name{font-weight:500;font-size:0.9rem}
-.book-item-time{font-size:0.8rem;color:var(--primary);font-weight:600}
-.empty-state{color:#b2bec3;text-align:center;padding:20px;font-size:0.9rem}
-::-webkit-scrollbar{width:6px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--secondary);border-radius:3px}
-.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--dark);color:white;padding:12px 24px;border-radius:25px;font-size:0.9rem;opacity:0;transition:all 0.3s ease;z-index:1000}
-.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+* {margin:0;padding:0;box-sizing:border-box}
+:root {
+    --primary: #6366f1;
+    --secondary: #ec4899;
+    --accent: #10b981;
+    --glass: rgba(255,255,255,0.1);
+    --glass-border: rgba(255,255,255,0.2);
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    padding: 10px;
+    padding-bottom: 90px;
+    color: #1f2937;
+}
+
+.header {
+    text-align: center;
+    color: white;
+    padding: 20px 0;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+.header h1 {
+    font-size: 1.8rem;
+    margin-bottom: 5px;
+    background: linear-gradient(to right, #fff, #e0e7ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.header p {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    color: #e0e7ff;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* 玻璃卡片 */
+.card {
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(12px);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1), inset 0 0 0 1px rgba(255,255,255,0.6);
+    border: 1px solid rgba(255,255,255,0.4);
+}
+.card-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #4f46e5, #ec4899);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* 日历 */
+.cal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+.cal-header h2 {
+    font-size: 1.1rem;
+    color: #4c1d95;
+    font-weight: 700;
+}
+.cal-header button {
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: linear-gradient(135deg, #8b5cf6, #ec4899);
+    color: white;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2rem;
+    box-shadow: 0 4px 12px rgba(139,92,246,0.4);
+}
+.cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    text-align: center;
+}
+.cal-grid .weekday {
+    font-weight: 700;
+    color: #6b21a8;
+    padding: 8px 0;
+    font-size: 0.85rem;
+}
+.cal-day {
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    cursor: pointer;
+    padding: 4px;
+    min-height: 50px;
+    background: rgba(255,255,255,0.5);
+    border: 1px solid rgba(255,255,255,0.3);
+}
+.cal-day.today {
+    background: linear-gradient(135deg, #8b5cf6, #ec4899);
+    color: white;
+}
+.cal-day.selected {
+    background: linear-gradient(135deg, #06b6d4, #10b981);
+    color: white;
+}
+.cal-day.other {
+    opacity: 0.3;
+}
+.cal-num {
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+.cal-dot {
+    width: 5px;
+    height: 5px;
+    background: #10b981;
+    border-radius: 50%;
+    margin-top: 3px;
+}
+
+/* 书架 */
+.book-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+.add-btn {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #8b5cf6, #ec4899);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(139,92,246,0.4);
+}
+.book-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: rgba(255,255,255,0.6);
+    border-radius: 12px;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+.book-cover {
+    width: 45px;
+    height: 60px;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #8b5cf6, #ec4899);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.2rem;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+.book-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.book-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #4c1d95;
+}
+.book-time {
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+.empty {
+    text-align: center;
+    color: #9ca3af;
+    padding: 40px;
+    font-size: 0.9rem;
+    background: rgba(255,255,255,0.5);
+    border-radius: 12px;
+    border: 2px dashed rgba(139,92,246,0.3);
+}
+
+/* 笔记 */
+.note-area {
+    background: rgba(255,255,255,0.6);
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+}
+.note-area select, .note-area textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid rgba(139,92,246,0.2);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    background: rgba(255,255,255,0.8);
+}
+.note-area textarea {
+    height: 100px;
+    resize: none;
+}
+.save-btn {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #06b6d4, #10b981);
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(6,182,212,0.4);
+}
+.note-item {
+    padding: 15px;
+    background: rgba(255,255,255,0.7);
+    border-radius: 12px;
+    margin-bottom: 10px;
+    border-left: 4px solid #8b5cf6;
+}
+.note-book {
+    font-size: 0.85rem;
+    color: #6b21a8;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+.note-text {
+    font-size: 0.9rem;
+    color: #374151;
+}
+
+/* 磨砂玻璃底部导航 */
+.nav {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 40px);
+    max-width: 500px;
+    height: 70px;
+    background: rgba(255,255,255,0.25);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 24px;
+    display: flex;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2), inset 0 0 0 1px rgba(255,255,255,0.4);
+    border: 1px solid rgba(255,255,255,0.3);
+    z-index: 1000;
+    overflow: hidden;
+}
+.nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    cursor: pointer;
+    color: rgba(255,255,255,0.7);
+    font-size: 0.7rem;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+.nav-item.active {
+    color: white;
+    background: rgba(255,255,255,0.2);
+}
+.nav-icon {
+    font-size: 1.3rem;
+}
+
+/* 弹窗 */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+.modal.show {
+    display: flex;
+}
+.modal-content {
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(20px);
+    padding: 25px;
+    border-radius: 24px;
+    width: 100%;
+    max-width: 380px;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+}
+.modal-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    text-align: center;
+    background: linear-gradient(135deg, #4f46e5, #ec4899);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.modal-input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 12px;
+    border: 1px solid rgba(139,92,246,0.3);
+    border-radius: 12px;
+    font-size: 0.95rem;
+}
+.modal-btn {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #8b5cf6, #ec4899);
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 8px;
+}
+.modal-btn.gray {
+    background: rgba(209,213,219,0.8);
+    color: #4b5563;
+}
+.timer-display {
+    font-size: 2.5rem;
+    text-align: center;
+    font-family: monospace;
+    margin: 20px 0;
+    font-weight: 700;
+    background: linear-gradient(135deg, #4f46e5, #ec4899);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.hide {display: none}
+
+/* 警告条 */
+.warning-bar {
+    background: rgba(239,68,68,0.9);
+    color: white;
+    padding: 10px;
+    text-align: center;
+    font-size: 0.85rem;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    display: none;
+}
+.warning-bar.show {
+    display: block;
+}
+
+@media(min-width: 768px) {
+    .desktop-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 20px;
+    }
+    .desktop-grid .card {
+        margin-bottom: 0;
+    }
+}
 </style>
 </head>
 <body>
-<div class="app-container">
-<header class="app-header">
-<h1>📚 读书笔记日历</h1>
-<p>记录每一天的阅读时光</p>
-</header>
-<div class="main-layout">
+<div class="container">
+<div class="header">
+<h1>📚 读书笔记</h1>
+<p>记录每一次阅读的美好</p>
+</div>
+
+<!-- 存储警告 -->
+<div class="warning-bar" id="storage-warning">
+⚠️ 浏览器存储受限，数据将在刷新后重置
+</div>
+
+<div id="content-area">
+<!-- 日历 -->
+<div class="card" id="view-calendar">
+<div class="card-title">📅 日历</div>
+<div class="cal-header">
+<h2 id="cal-title">2024年1月</h2>
 <div>
-<div class="card">
-<div class="calendar-header">
-<h2 id="calendarTitle"></h2>
-<div class="calendar-nav">
-<button onclick="changeMonth(-1)">‹</button>
-<button onclick="changeMonth(1)">›</button>
+<button onclick="prevMonth()">‹</button>
+<button onclick="nextMonth()">›</button>
 </div>
 </div>
-<div class="calendar-grid" id="calendarGrid"></div>
-<div class="stats-bar">
-<div class="stat-item"><div class="stat-number" id="statDays">0</div><div class="stat-label">本月阅读天数</div></div>
-<div class="stat-item"><div class="stat-number" id="statBooks">0</div><div class="stat-label">在读书籍</div></div>
-<div class="stat-item"><div class="stat-number" id="statTime">0h</div><div class="stat-label">本月阅读时长</div></div>
+<div class="cal-grid" id="cal-grid"></div>
 </div>
+
+<!-- 笔记 -->
+<div class="card hide" id="view-notes">
+<div class="card-title">📝 笔记</div>
+<div class="note-area">
+<select id="sel-book"><option value="">选择书籍</option></select>
+<textarea id="txt-note" placeholder="今天读了什么？有什么感悟？"></textarea>
+<button class="save-btn" onclick="saveNote()">保存笔记</button>
 </div>
-<div class="card" style="margin-top:20px">
-<h3>📝 当日笔记</h3>
-<p class="notes-date" id="selectedDateLabel">请选择日期</p>
-<div class="notes-list" id="notesList"><p class="empty-state">这天还没有笔记 ✨</p></div>
+<div id="note-list"><div class="empty">选择日期查看笔记</div></div>
 </div>
+
+<!-- 书架 -->
+<div class="card hide" id="view-books">
+<div class="book-header">
+<div class="card-title">📖 书架</div>
+<button class="add-btn" onclick="openAddBook()">+</button>
 </div>
-<div class="right-panel">
-<div class="card timer-card">
-<h3>⏱️ 阅读计时器</h3>
-<select class="timer-book-select" id="timerBookSelect"><option value="">选择正在读的书...</option></select>
-<div class="timer-display" id="timerDisplay">00:00:00</div>
-<div class="timer-controls">
-<button class="btn-start" id="btnStart" onclick="startTimer()">开始</button>
-<button class="btn-pause" id="btnPause" onclick="pauseTimer()" style="display:none">暂停</button>
-<button class="btn-stop" id="btnStop" onclick="stopTimer()" style="display:none">结束</button>
-</div>
-</div>
-<div class="card notes-card">
-<h3>✍️ 添加笔记</h3>
-<p class="notes-date" id="noteFormDate"></p>
-<div class="book-input-group">
-<input type="text" id="bookNameInput" placeholder="书名" list="bookSuggestions">
-<datalist id="bookSuggestions"></datalist>
-<button onclick="addBook()">+ 添加书</button>
-</div>
-<textarea class="note-textarea" id="noteContent" placeholder="写下你的读书感悟..."></textarea>
-<button class="save-note-btn" onclick="saveNote()">💾 保存笔记</button>
-</div>
-<div class="card book-list-card">
-<h3>📖 我的书架</h3>
-<div class="book-list" id="bookList"><p class="empty-state">还没有添加书籍</p></div>
+<div id="book-list"><div class="empty">点击右上角 + 添加书籍</div></div>
 </div>
 </div>
 </div>
+
+<!-- 磨砂玻璃导航 -->
+<div class="nav">
+<div class="nav-item active" onclick="switchView('calendar', this)">
+<div class="nav-icon">📅</div>
+<div>日历</div>
 </div>
-<div class="toast" id="toast"></div>
+<div class="nav-item" onclick="switchView('notes', this)">
+<div class="nav-icon">📝</div>
+<div>笔记</div>
+</div>
+<div class="nav-item" onclick="switchView('books', this)">
+<div class="nav-icon">📚</div>
+<div>书架</div>
+</div>
+<div class="nav-item" onclick="openTimer()">
+<div class="nav-icon">⏱️</div>
+<div>计时</div>
+</div>
+</div>
+
+<!-- 添加书籍弹窗 -->
+<div class="modal" id="modal-add">
+<div class="modal-content">
+<div class="modal-title">✨ 添加新书</div>
+<input type="text" class="modal-input" id="inp-name" placeholder="书名（必填）">
+<input type="text" class="modal-input" id="inp-cover" placeholder="封面图片链接（可选）">
+<button class="modal-btn" onclick="addBook()">确认添加</button>
+<button class="modal-btn gray" onclick="closeModal()">取消</button>
+</div>
+</div>
+
+<!-- 计时器弹窗 -->
+<div class="modal" id="modal-timer">
+<div class="modal-content">
+<div class="modal-title">⏱️ 专注阅读</div>
+<select class="modal-input" id="sel-timer-book"><option value="">选择书籍</option></select>
+<div class="timer-display" id="timer-disp">00:00:00</div>
+<div style="display:flex;gap:8px;margin-bottom:10px">
+<button class="modal-btn" onclick="startTimer()" id="btn-start" style="flex:1;background:linear-gradient(135deg,#06b6d4,#10b981)">开始</button>
+<button class="modal-btn" onclick="pauseTimer()" id="btn-pause" style="flex:1;display:none;background:linear-gradient(135deg,#f59e0b,#f97316)">暂停</button>
+<button class="modal-btn" onclick="stopTimer()" id="btn-stop" style="flex:1;display:none;background:linear-gradient(135deg,#ec4899,#f43f5e)">结束</button>
+</div>
+<button class="modal-btn gray" onclick="closeTimer()">关闭</button>
+</div>
+</div>
+
 <script>
-let currentDate=new Date();let selectedDate=new Date();let timerInterval=null;let timerSeconds=0;let timerRunning=false;
-function getData(){return JSON.parse(localStorage.getItem('readingNotes')||'{"notes":[],"books":[],"readingTime":{}}')}
-function saveDataStore(data){localStorage.setItem('readingNotes',JSON.stringify(data))}
-function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)}
-function getDateStr(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
-function formatTime(seconds){if(!seconds)return'0分钟';const h=Math.floor(seconds/3600);const m=Math.floor((seconds%3600)/60);if(h>0)return h+'时'+m+'分';return m+'分钟'}
-function formatTimerDisplay(seconds){const h=Math.floor(seconds/3600);const m=Math.floor((seconds%3600)/60);const s=seconds%60;return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0')}
-function renderCalendar(){const year=currentDate.getFullYear();const month=currentDate.getMonth();document.getElementById('calendarTitle').textContent=year+'年 '+(month+1)+'月';const grid=document.getElementById('calendarGrid');grid.innerHTML='';const dayNames=['日','一','二','三','四','五','六'];dayNames.forEach(n=>{const el=document.createElement('div');el.className='day-name';el.textContent=n;grid.appendChild(el)});const firstDay=new Date(year,month,1).getDay();const daysInMonth=new Date(year,month+1,0).getDate();const prevDays=new Date(year,month,0).getDate();const today=new Date();const data=getData();for(let i=firstDay-1;i>=0;i--){const el=document.createElement('div');el.className='day-cell other-month';el.textContent=prevDays-i;grid.appendChild(el)}for(let day=1;day<=daysInMonth;day++){const el=document.createElement('div');el.className='day-cell';el.textContent=day;const dateStr=year+'-'+String(month+1).padStart(2,'0')+'-'+String(day).padStart(2,'0');if(today.getFullYear()===year&&today.getMonth()===month&&today.getDate()===day)el.classList.add('today');if(selectedDate.getFullYear()===year&&selectedDate.getMonth()===month&&selectedDate.getDate()===day)el.classList.add('selected');if(data.notes.some(n=>n.date===dateStr))el.classList.add('has-notes');el.onclick=()=>selectDate(year,month,day);grid.appendChild(el)}const total=firstDay+daysInMonth;const rem=(7-total%7)%7;for(let i=1;i<=rem;i++){const el=document.createElement('div');el.className='day-cell other-month';el.textContent=i;grid.appendChild(el)}updateStats()}
-function changeMonth(delta){currentDate.setMonth(currentDate.getMonth()+delta);renderCalendar()}
-function selectDate(y,m,d){selectedDate=new Date(y,m,d);renderCalendar();renderNotes();updateNoteFormDate()}
-function updateNoteFormDate(){const s=getDateStr(selectedDate);document.getElementById('noteFormDate').textContent=s;document.getElementById('selectedDateLabel').textContent=s}
-function updateStats(){const data=getData();const year=currentDate.getFullYear();const month=currentDate.getMonth();const prefix=year+'-'+String(month+1).padStart(2,'0');const monthNotes=data.notes.filter(n=>n.date.startsWith(prefix));const uniqueDays=new Set(monthNotes.map(n=>n.date));document.getElementById('statDays').textContent=uniqueDays.size;document.getElementById('statBooks').textContent=data.books.length;const totalSec=Object.values(data.readingTime).reduce((a,b)=>a+b,0);const hours=Math.round(totalSec/3600*10)/10;document.getElementById('statTime').textContent=hours+'h'}
-function renderNotes(){const data=getData();const dateStr=getDateStr(selectedDate);const dayNotes=data.notes.filter(n=>n.date===dateStr);const list=document.getElementById('notesList');if(dayNotes.length===0){list.innerHTML='<p class="empty-state">这天还没有笔记 ✨</p>';return}list.innerHTML=dayNotes.map((note,i)=>'<div class="note-item"><div class="note-item-header"><span class="note-item-book">📖 '+note.book+'</span><div>'+(note.readingTime?'<span class="note-item-time">⏱ '+formatTime(note.readingTime)+'</span>':'')+'<button class="note-item-delete" onclick="deleteNote(\''+dateStr+'\','+i+')">✕</button></div></div><div class="note-item-content">'+escapeHtml(note.content)+'</div></div>').join('')}
-function escapeHtml(text){const div=document.createElement('div');div.textContent=text;return div.innerHTML}
-function saveNote(){const book=document.getElementById('bookNameInput').value.trim();const content=document.getElementById('noteContent').value.trim();if(!book){showToast('请输入书名');return}if(!content){showToast('请输入笔记内容');return}const data=getData();data.notes.push({date:getDateStr(selectedDate),book,content,readingTime:0,createdAt:new Date().toISOString()});if(!data.books.includes(book)){data.books.push(book);if(!data.readingTime[book])data.readingTime[book]=0}saveDataStore(data);document.getElementById('noteContent').value='';renderNotes();renderCalendar();renderBookList();updateBookSuggestions();updateTimerSelect();showToast('笔记已保存 ✨')}
-function deleteNote(dateStr,idx){const data=getData();const dayNotes=data.notes.filter(n=>n.date===dateStr);const target=dayNotes[idx];const realIdx=data.notes.indexOf(target);if(realIdx>-1)data.notes.splice(realIdx,1);saveDataStore(data);renderNotes();renderCalendar();showToast('笔记已删除')}
-function addBook(){const input=document.getElementById('bookNameInput');const book=input.value.trim();if(!book){showToast('请输入书名');return}const data=getData();if(data.books.includes(book)){showToast('这本书已在书架中');return}data.books.push(book);if(!data.readingTime[book])data.readingTime[book]=0;saveDataStore(data);renderBookList();updateBookSuggestions();updateTimerSelect();showToast('《'+book+'》已添加到书架')}
-function renderBookList(){const data=getData();const list=document.getElementById('bookList');if(data.books.length===0){list.innerHTML='<p class="empty-state">还没有添加书籍</p>';return}list.innerHTML=data.books.map(book=>'<div class="book-item"><span class="book-item-name">📖 '+book+'</span><span class="book-item-time">'+formatTime(data.readingTime[book]||0)+'</span></div>').join('')}
-function updateBookSuggestions(){const data=getData();document.getElementById('bookSuggestions').innerHTML=data.books.map(b=>'<option value="'+b+'">').join('')}
-function updateTimerSelect(){const data=getData();const sel=document.getElementById('timerBookSelect');const cur=sel.value;sel.innerHTML='<option value="">选择正在读的书...</option>'+data.books.map(b=>'<option value="'+b+'">'+b+'</option>').join('');sel.value=cur}
-function startTimer(){const book=document.getElementById('timerBookSelect').value;if(!book){showToast('请先选择一本书');return}timerRunning=true;document.getElementById('btnStart').style.display='none';document.getElementById('btnPause').style.display='inline-block';document.getElementById('btnStop').style.display='inline-block';timerInterval=setInterval(()=>{timerSeconds++;document.getElementById('timerDisplay').textContent=formatTimerDisplay(timerSeconds)},1000)}
-function pauseTimer(){if(timerRunning){clearInterval(timerInterval);timerRunning=false;document.getElementById('btnPause').textContent='继续'}else{timerRunning=true;timerInterval=setInterval(()=>{timerSeconds++;document.getElementById('timerDisplay').textContent=formatTimerDisplay(timerSeconds)},1000);document.getElementById('btnPause').textContent='暂停'}}
-function stopTimer(){clearInterval(timerInterval);timerRunning=false;const book=document.getElementById('timerBookSelect').value;if(book&&timerSeconds>0){const data=getData();if(!data.readingTime[book])data.readingTime[book]=0;data.readingTime[book]+=timerSeconds;saveDataStore(data);renderBookList();updateStats();showToast('《'+book+'》本次阅读 '+formatTime(timerSeconds))}timerSeconds=0;document.getElementById('timerDisplay').textContent='00:00:00';document.getElementById('btnStart').style.display='inline-block';document.getElementById('btnPause').style.display='none';document.getElementById('btnStop').style.display='none';document.getElementById('btnPause').textContent='暂停'}
-renderCalendar();updateNoteFormDate();renderNotes();renderBookList();updateBookSuggestions();updateTimerSelect();
+// ========== 数据存储（带内存后备）==========
+let memoryData = {notes:[], books:[], covers:{}, times:{}};
+let useMemory = false;
+
+function getData(){
+    if(useMemory) return JSON.parse(JSON.stringify(memoryData));
+    try {
+        let d = localStorage.getItem('reading_data_v6');
+        if(!d) return {notes:[], books:[], covers:{}, times:{}};
+        return JSON.parse(d);
+    } catch(e) {
+        console.warn('Storage failed, using memory:', e);
+        useMemory = true;
+        document.getElementById('storage-warning').classList.add('show');
+        return JSON.parse(JSON.stringify(memoryData));
+    }
+}
+
+function setData(d){
+    memoryData = JSON.parse(JSON.stringify(d)); // 始终更新内存
+    if(useMemory) return true;
+    try {
+        localStorage.setItem('reading_data_v6', JSON.stringify(d));
+        return true;
+    } catch(e) {
+        console.warn('Storage save failed:', e);
+        useMemory = true;
+        document.getElementById('storage-warning').classList.add('show');
+        return true; // 仍然返回true，因为内存已保存
+    }
+}
+
+// ========== 日历 ==========
+let curDate = new Date();
+let selDate = new Date();
+
+function initCal(){
+    let y = curDate.getFullYear();
+    let m = curDate.getMonth();
+    document.getElementById('cal-title').textContent = `${y}年${m+1}月`;
+    
+    let grid = document.getElementById('cal-grid');
+    grid.innerHTML = '';
+    
+    ['日','一','二','三','四','五','六'].forEach(w => {
+        let d = document.createElement('div');
+        d.className = 'weekday';
+        d.textContent = w;
+        grid.appendChild(d);
+    });
+    
+    let data = getData();
+    let firstDay = new Date(y, m, 1).getDay();
+    let daysInMonth = new Date(y, m+1, 0).getDate();
+    let prevDays = new Date(y, m, 0).getDate();
+    let today = new Date();
+    
+    for(let i = firstDay - 1; i >= 0; i--){
+        let d = document.createElement('div');
+        d.className = 'cal-day other';
+        d.innerHTML = `<span class="cal-num">${prevDays - i}</span>`;
+        grid.appendChild(d);
+    }
+    
+    for(let i = 1; i <= daysInMonth; i++){
+        let d = document.createElement('div');
+        d.className = 'cal-day';
+        let dateStr = `${y}-${String(m+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
+        let hasNote = data.notes.some(n => n.date === dateStr);
+        
+        d.innerHTML = `<span class="cal-num">${i}</span>${hasNote ? '<span class="cal-dot"></span>' : ''}`;
+        
+        if(y === today.getFullYear() && m === today.getMonth() && i === today.getDate()){
+            d.classList.add('today');
+        }
+        if(y === selDate.getFullYear() && m === selDate.getMonth() && i === selDate.getDate()){
+            d.classList.add('selected');
+        }
+        
+        d.onclick = function(){
+            selDate = new Date(y, m, i);
+            initCal();
+            initNotes();
+            if(window.innerWidth < 768){
+                switchView('notes', document.querySelectorAll('.nav-item')[1]);
+            }
+        };
+        grid.appendChild(d);
+    }
+    
+    let remain = (7 - (firstDay + daysInMonth) % 7) % 7;
+    for(let i = 1; i <= remain; i++){
+        let d = document.createElement('div');
+        d.className = 'cal-day other';
+        d.innerHTML = `<span class="cal-num">${i}</span>`;
+        grid.appendChild(d);
+    }
+}
+
+function prevMonth(){
+    curDate.setMonth(curDate.getMonth() - 1);
+    initCal();
+}
+
+function nextMonth(){
+    curDate.setMonth(curDate.getMonth() + 1);
+    initCal();
+}
+
+// ========== 书架 ==========
+function initBooks(){
+    let data = getData();
+    let list = document.getElementById('book-list');
+    let selBook = document.getElementById('sel-book');
+    let selTimer = document.getElementById('sel-timer-book');
+    
+    if(data.books.length === 0){
+        list.innerHTML = '<div class="empty">点击右上角 + 添加第一本书</div>';
+    } else {
+        list.innerHTML = data.books.map(b => {
+            let cover = data.covers[b];
+            let mins = Math.floor((data.times[b] || 0) / 60);
+            return `<div class="book-item" onclick="selectBook('${b.replace(/'/g,"\\'")}')">
+                <div class="book-cover">${cover ? `<img src="${cover}" onerror="this.style.display='none'">` : '📖'}</div>
+                <div>
+                    <div class="book-name">${b}</div>
+                    <div class="book-time">已读 ${mins} 分钟</div>
+                </div>
+            </div>`;
+        }).join('');
+    }
+    
+    let opts = data.books.map(b => `<option value="${b.replace(/"/g,'&quot;')}">${b}</option>`).join('');
+    selBook.innerHTML = '<option value="">选择书籍</option>' + opts;
+    selTimer.innerHTML = '<option value="">选择书籍</option>' + opts;
+}
+
+function openAddBook(){
+    document.getElementById('inp-name').value = '';
+    document.getElementById('inp-cover').value = '';
+    document.getElementById('modal-add').classList.add('show');
+    setTimeout(() => document.getElementById('inp-name').focus(), 100);
+}
+
+function closeModal(){
+    document.getElementById('modal-add').classList.remove('show');
+}
+
+function addBook(){
+    let name = document.getElementById('inp-name').value.trim();
+    let cover = document.getElementById('inp-cover').value.trim();
+    
+    if(!name){
+        alert('请输入书名');
+        return;
+    }
+    
+    let data = getData();
+    
+    if(data.books.includes(name)){
+        alert('《' + name + '》已在书架中');
+        return;
+    }
+    
+    data.books.push(name);
+    data.times[name] = 0;
+    if(cover) data.covers[name] = cover;
+    
+    if(setData(data)){
+        initBooks();
+        closeModal();
+        // 成功提示
+        let toast = document.createElement('div');
+        toast.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:linear-gradient(135deg,#10b981,#06b6d4);color:white;padding:15px 30px;border-radius:50px;font-weight:700;box-shadow:0 10px 30px rgba(0,0,0,0.3);z-index:9999;animation:popIn 0.3s';
+        toast.textContent = '《' + name + '》添加成功';
+        document.body.appendChild(toast);
+        setTimeout(() => {
+            toast.style.animation = 'popOut 0.3s';
+            setTimeout(() => toast.remove(), 300);
+        }, 1500);
+    }
+}
+
+function selectBook(name){
+    document.getElementById('sel-book').value = name;
+    switchView('notes', document.querySelectorAll('.nav-item')[1]);
+}
+
+// ========== 笔记 ==========
+function initNotes(){
+    let data = getData();
+    let dateStr = `${selDate.getFullYear()}-${String(selDate.getMonth()+1).padStart(2,'0')}-${String(selDate.getDate()).padStart(2,'0')}`;
+    let list = document.getElementById('note-list');
+    let notes = data.notes.filter(n => n.date === dateStr).reverse();
+    
+    if(notes.length === 0){
+        list.innerHTML = `<div class="empty">${dateStr}<br>还没有笔记</div>`;
+    } else {
+        list.innerHTML = notes.map(n => `
+            <div class="note-item">
+                <div class="note-book">${n.book}</div>
+                <div class="note-text">${n.content}</div>
+            </div>
+        `).join('');
+    }
+}
+
+function saveNote(){
+    let book = document.getElementById('sel-book').value;
+    let text = document.getElementById('txt-note').value.trim();
+    
+    if(!book){ alert('请选择书籍'); return; }
+    if(!text){ alert('请输入笔记内容'); return; }
+    
+    let data = getData();
+    let dateStr = `${selDate.getFullYear()}-${String(selDate.getMonth()+1).padStart(2,'0')}-${String(selDate.getDate()).padStart(2,'0')}`;
+    
+    data.notes.push({
+        date: dateStr,
+        book: book,
+        content: text
+    });
+    
+    if(setData(data)){
+        document.getElementById('txt-note').value = '';
+        initNotes();
+        initCal();
+        alert('笔记保存成功');
+    }
+}
+
+// ========== 计时器 ==========
+let timerInt = null;
+let timerSec = 0;
+let isRunning = false;
+
+function openTimer(){
+    initBooks();
+    document.getElementById('modal-timer').classList.add('show');
+}
+
+function closeTimer(){
+    if(timerInt){
+        clearInterval(timerInt);
+        timerInt = null;
+    }
+    isRunning = false;
+    timerSec = 0;
+    document.getElementById('timer-disp').textContent = '00:00:00';
+    document.getElementById('btn-start').style.display = 'block';
+    document.getElementById('btn-pause').style.display = 'none';
+    document.getElementById('btn-stop').style.display = 'none';
+    document.getElementById('modal-timer').classList.remove('show');
+}
+
+function startTimer(){
+    let book = document.getElementById('sel-timer-book').value;
+    if(!book){ alert('请选择书籍'); return; }
+    
+    isRunning = true;
+    document.getElementById('btn-start').style.display = 'none';
+    document.getElementById('btn-pause').style.display = 'block';
+    document.getElementById('btn-stop').style.display = 'block';
+    
+    timerInt = setInterval(() => {
+        timerSec++;
+        let h = Math.floor(timerSec / 3600);
+        let m = Math.floor((timerSec % 3600) / 60);
+        let s = timerSec % 60;
+        document.getElementById('timer-disp').textContent = 
+            `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    }, 1000);
+}
+
+function pauseTimer(){
+    if(isRunning){
+        clearInterval(timerInt);
+        isRunning = false;
+        document.getElementById('btn-pause').textContent = '继续';
+    } else {
+        isRunning = true;
+        document.getElementById('btn-pause').textContent = '暂停';
+        timerInt = setInterval(() => {
+            timerSec++;
+            let h = Math.floor(timerSec / 3600);
+            let m = Math.floor((timerSec % 3600) / 60);
+            let s = timerSec % 60;
+            document.getElementById('timer-disp').textContent = 
+                `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+        }, 1000);
+    }
+}
+
+function stopTimer(){
+    clearInterval(timerInt);
+    isRunning = false;
+    let book = document.getElementById('sel-timer-book').value;
+    
+    if(book && timerSec > 0){
+        let data = getData();
+        data.times[book] = (data.times[book] || 0) + timerSec;
+        setData(data);
+        initBooks();
+        alert(`阅读${Math.floor(timerSec/60)}分钟已记录`);
+    }
+    
+    closeTimer();
+}
+
+// ========== 视图切换 ==========
+function switchView(viewName, el){
+    document.getElementById('view-calendar').classList.add('hide');
+    document.getElementById('view-notes').classList.add('hide');
+    document.getElementById('view-books').classList.add('hide');
+    
+    document.getElementById('view-' + viewName).classList.remove('hide');
+    
+    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+    if(el) el.classList.add('active');
+}
+
+// ========== 初始化 ==========
+window.addEventListener('load', function(){
+    // 检测存储是否可用
+    try {
+        localStorage.setItem('test', '1');
+        localStorage.removeItem('test');
+    } catch(e) {
+        useMemory = true;
+        document.getElementById('storage-warning').classList.add('show');
+        console.warn('LocalStorage not available, using memory mode');
+    }
+    
+    initCal();
+    initBooks();
+    initNotes();
+    
+    if(window.innerWidth >= 768){
+        document.getElementById('content-area').classList.add('desktop-grid');
+        document.getElementById('view-calendar').classList.remove('hide');
+        document.getElementById('view-notes').classList.remove('hide');
+        document.getElementById('view-books').classList.remove('hide');
+    }
+});
+
+// 动画CSS
+let style = document.createElement('style');
+style.textContent = `
+@keyframes popIn { from { opacity: 0; transform: translate(-50%,-50%) scale(0.8); } to { opacity: 1; transform: translate(-50%,-50%) scale(1); } }
+@keyframes popOut { from { opacity: 1; transform: translate(-50%,-50%) scale(1); } to { opacity: 0; transform: translate(-50%,-50%) scale(0.8); } }
+`;
+document.head.appendChild(style);
 </script>
 </body>
 </html>
